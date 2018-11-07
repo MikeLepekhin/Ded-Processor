@@ -1,0 +1,8 @@
+//
+// Created by mike on 29.10.18.
+//
+
+#ifndef DED_PROCESSOR_EXCEPTION_H
+#define DED_PROCESSOR_EXCEPTION_H
+
+#endif //DED_PROCESSOR_EXCEPTION_H
