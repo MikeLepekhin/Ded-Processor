@@ -1,5 +1,7 @@
-push 1
-push 2
+in rax
+push rax
+in rbx
+push rbx
 add
-push 3
-mul
+pop rcx
+out rcx
