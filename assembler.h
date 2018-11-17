@@ -8,18 +8,16 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
 #include <cstring>
 #include <unordered_map>
 #include <ctype.h>
 
 #include "exception.h"
+#include "executor.h"
 
 const size_t ARG_SIZE = 30;
-
-bool isCorrect() {
-  return true;
-}
 
 bool isDigit(char ch) {
   return ch >= '0' && ch <= '9';
@@ -105,43 +103,49 @@ std::pair<int, int> objectRAM(char arg[ARG_SIZE]) {
     }
     value2[len - 1 - (plus_pos + 1)] = 0;
 
-
-    //std::cout << "RAM obj: " << value1 << ' ' << value2 << ' ' << regNum(value1) << ' ' << atoi(value2) << '\n';
-
     return {regNum(value1), atoi(value2)};
   } else {
     return {-1, -1};
   }
 }
 
+bool isJump(const std::string& cmd_name) {
+  return cmd_name == "jmp" || cmd_name == "call" || cmd_name == "je" || cmd_name == "jne" ||
+         cmd_name == "jl" || cmd_name == "jle";
+}
+
 void parseCommand(size_t cmd_id, const std::string& cmd, size_t arg_cnt, size_t support_mask,
-                  std::vector<std::pair<double, int>>& arg_values, FILE* asm_file) {
+                  std::vector<std::pair<double, int>>& arg_values, std::vector<std::string>& label_request,
+                  FILE* asm_file) {
 
   char arg[ARG_SIZE];
 
- // std::cout << cmd << ":\n";
+  if (isJump(cmd)) {
+    fscanf(asm_file, "%s", arg);
+    label_request.push_back(std::string(arg));
+
+    //std::cout << "!!! JUMP\n";
+    //std::cout << arg << '\n';
+    return;
+  }
 
   for (size_t arg_id = 0; arg_id < arg_cnt; ++arg_id) {
     fscanf(asm_file, "%s", arg);
-  //  std::cout << "[" << std::string(arg) << "]" << '\n';
+
     if (isFloatNumber(arg)) {
       if (!(support_mask & 1)) {
         throw IncorrectArgumentException("numbers are not allowed as arguments of " + cmd);
       }
-  //    std::cout << "is number\n";
       arg_values.push_back({atof(arg), 1});
     } else if (regNum(arg) != -1) {
       if (!(support_mask & 2)) {
         throw IncorrectArgumentException("registers are not allowed as arguments of " + cmd);
       }
-  //    std::cout << "is register\n";
       arg_values.push_back({regNum(arg), 2});
     } else {
       if (!(support_mask & 4)) {
         throw IncorrectArgumentException("RAM is not allowed as argument of " + cmd);
       }
-
-//      std::cout << "is ram\n";
       std::pair<int, int> ram_obj = objectRAM(arg);
 
       if (ram_obj.first == -1 || ram_obj.second == -1) {
@@ -153,25 +157,27 @@ void parseCommand(size_t cmd_id, const std::string& cmd, size_t arg_cnt, size_t 
   }
 }
 
-void encodeCommand(size_t cmd_id, size_t arg_cnt,
-                     const std::vector<std::pair<double, int>>& arg_values, FILE* binary_file) {
-  fwrite(&cmd_id, sizeof(size_t), 1, binary_file);
-  fwrite(&arg_cnt, sizeof(size_t), 1, binary_file);
-  std::cout << "cmd " << cmd_id << ' ' << arg_cnt << '\n';
-  for (size_t arg_id = 0; arg_id < arg_cnt; ++arg_id) {
-    fwrite(&arg_values[arg_id].second, sizeof(int), 1, binary_file);
-    fwrite(&arg_values[arg_id].first, sizeof(double), 1, binary_file);
-    std::cout << arg_values[arg_id].second << ' ' << arg_values[arg_id].first << '\n';
+void encodeCommand(const Command<double>& cmd, FILE* binary_file) {
+  fwrite(&cmd.cmd_id, sizeof(size_t), 1, binary_file);
+  fwrite(&cmd.arg_cnt, sizeof(size_t), 1, binary_file);
+  std::cout << "cmd " << cmd.cmd_id << ' ' << cmd.arg_cnt << '\n';
+
+  for (size_t arg_id = 0; arg_id < cmd.arg_cnt; ++arg_id) {
+    fwrite(&cmd.args[arg_id].second, sizeof(int), 1, binary_file);
+    fwrite(&cmd.args[arg_id].first, sizeof(double), 1, binary_file);
+    std::cout << cmd.args[arg_id].second << ' ' << cmd.args[arg_id].first << '\n';
   }
 }
 
 void assemblyCommand(size_t cmd_id, const std::string& cmd, size_t arg_cnt, size_t support_mask,
-                    FILE* asm_file, FILE* binary_file) {
+                     std::vector<Command<double>>& commands, std::vector<std::string>& label_request,
+                     FILE* asm_file) {
 
-  std::vector<std::pair<double, int>> arg_values;
+  std::vector<std::pair<double, int>> args;
 
-  parseCommand(cmd_id, cmd, arg_cnt, support_mask, arg_values, asm_file);
-  encodeCommand(cmd_id, arg_cnt, arg_values, binary_file);
+  parseCommand(cmd_id, cmd, arg_cnt, support_mask, args, label_request, asm_file);
+  commands.push_back(Command<double>{cmd_id, cmd, arg_cnt, args});
+  //encodeCommand(cmd_id, arg_cnt, arg_values, binary_file);
 }
 
 void removeSpaceChars(std::string& str) {
@@ -185,7 +191,11 @@ void removeSpaceChars(std::string& str) {
 }
 
 void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
-  std::unordered_map<std::string, size_t> labels;
+  std::vector<Command<double>> commands;
+
+  std::unordered_map<std::string, int> jump_to;
+  std::vector<std::string> label_request;
+  size_t cur_label_request = 0;
 
   while (!feof(asm_file)) {
     char cmd_buf[ARG_SIZE];
@@ -199,40 +209,75 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
     if (cmd == "") {
       continue;
     }
+    if (cmd[0] == ':') {
+      cmd = cmd.erase(0, 1);
+      if (jump_to.find(cmd) != jump_to.end()) {
+        throw IncorrectArgumentException("double declaration of label " + cmd, __PRETTY_FUNCTION__);
+      }
+      jump_to[cmd] = commands.size();
+      continue;
+    }
 
     if (cmd == "move") {
-      assemblyCommand(1, "push", 1, 7, asm_file, binary_file);
-      assemblyCommand(2, "pop", 1, 6, asm_file, binary_file);
+      assemblyCommand(1, "push", 1, 7, commands, label_request, asm_file);
+      assemblyCommand(2, "pop", 1, 6, commands, label_request, asm_file);
       continue;
     }
 
     if (cmd == "push") {
-      assemblyCommand(1, "push", 1, 7, asm_file, binary_file);
+      assemblyCommand(1, "push", 1, 7, commands, label_request, asm_file);
     } else if (cmd == "pop") {
-      assemblyCommand(2, "pop", 1, 6, asm_file, binary_file);
+      assemblyCommand(2, "pop", 1, 6, commands, label_request, asm_file);
     } else if (cmd == "add") {
-      assemblyCommand(3, "add", 0, 0, asm_file, binary_file);
+      assemblyCommand(3, "add", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "sub") {
-      assemblyCommand(4, "sub", 0, 0, asm_file, binary_file);
+      assemblyCommand(4, "sub", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "mul") {
-      assemblyCommand(5, "mul", 0, 0, asm_file, binary_file);
+      assemblyCommand(5, "mul", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "div") {
-      assemblyCommand(6, "div", 0, 0, asm_file, binary_file);
+      assemblyCommand(6, "div", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "sqrt") {
-      assemblyCommand(7, "sqrt", 0, 0, asm_file, binary_file);
+      assemblyCommand(7, "sqrt", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "dup") {
-      assemblyCommand(8, "dup", 0, 0, asm_file, binary_file);
+      assemblyCommand(8, "dup", 0, 0, commands, label_request, asm_file);
     } else if (cmd == "in") {
-      assemblyCommand(9, "in", 1, 6, asm_file, binary_file);
+      assemblyCommand(9, "in", 1, 6, commands, label_request, asm_file);
     } else if (cmd == "out") {
-      assemblyCommand(10, "out", 1, 7, asm_file, binary_file);
+      assemblyCommand(10, "out", 1, 7, commands, label_request, asm_file);
     } else if (cmd == "end") {
-      assemblyCommand(11, "end", 0, 0, asm_file, binary_file);
+      assemblyCommand(11, "end", 0, 0, commands, label_request, asm_file);
+    } else if (cmd == "jmp") {
+      assemblyCommand(12, "jmp", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "call") {
+      assemblyCommand(13, "call", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "je") {
+      assemblyCommand(14, "je", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "jne") {
+      assemblyCommand(15, "jne", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "jl") {
+      assemblyCommand(16, "jl", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "jle") {
+      assemblyCommand(17, "jle", 1, 1, commands, label_request, asm_file);
+    } else if (cmd == "ret") {
+      assemblyCommand(18, "ret", 0, 0, commands, label_request, asm_file);
     } else {
-      throw IncorrectArgumentException(std::string("incorrect command") + cmd);
+      throw IncorrectArgumentException(std::string("incorrect command ") + cmd);
     }
   }
-  assemblyCommand(11, "end", 0, 0, asm_file, binary_file);
+  assemblyCommand(11, "end", 0, 0, commands, label_request, asm_file);
+
+
+  for (Command<double>& command: commands) {
+    if (isJump(command.cmd_name)) {
+      std::string cur_label = label_request[cur_label_request++];
+
+      if (jump_to.find(cur_label) == jump_to.end()) {
+        throw IncorrectArgumentException("incorrect label value", __PRETTY_FUNCTION__);
+      }
+      command.args.push_back({jump_to[cur_label], 1});
+    }
+    encodeCommand(command, binary_file);
+  }
 }
 
 #endif //DED_PROCESSOR_ASSEMBLER_H

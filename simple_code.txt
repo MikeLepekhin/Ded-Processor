@@ -1,8 +1,30 @@
 in rax
 push rax
-in rbx
-push rbx
-div
-pop rdx
-out rdx
-end
+call factorial
+
+pop rbx
+out rbx
+
+jmp finish
+
+:factorial
+
+    dup
+    push 1
+    je return_value
+
+    dup
+    push 1
+    sub
+
+    pop rcx
+    out rcx
+    push rcx
+
+    call factorial
+    mul
+
+:return_value
+    ret
+
+:finish

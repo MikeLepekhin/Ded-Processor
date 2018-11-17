@@ -558,13 +558,13 @@ class Stack {
 #endif
 
   void printStack() const {
-    std::cerr << "items: ";
+    std::cout << "items: ";
     if (item_count_ > 0) {
       for (size_t item_id = 0; item_id < item_count_; ++item_id) {
-        std::cerr << *getElementPtr(item_id) << ' ';
+        std::cout << *getElementPtr(item_id) << ' ';
       }
     }
-    std::cerr << '\n';
+    std::cout << '\n';
   }
 
   ~Stack() {

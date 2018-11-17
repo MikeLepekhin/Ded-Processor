@@ -33,6 +33,7 @@ class Processor {
  private:
   T registers_[REGISTER_COUNT];
   Stack<T> stack_;
+  Stack<size_t> instruction_stack_;
   RAM<T> ram_;
   FileBuffer fbuffer_;
 
@@ -116,7 +117,7 @@ class Processor {
 
     switch (cur_command.cmd_id) {
       case 1:
-        //std::cout << "execute 11\n";
+        //std::cout << "execute 1\n";
         stack_.push(getArgumentValue(cur_command.args[0]));
         break;
       case 2:
@@ -205,22 +206,78 @@ class Processor {
         break;
       }
       case 10:
-      {
         //std::cout << "execute 10\n";
         outCmd(getArgumentValue(cur_command.args[0]));
         break;
-      }
       case 11:
+        //std::cout << "execute 11\n";
+        instruction_pointer_ = commands.size();
+        return;
+      case 12:
+        //std::cout << "execute 12\n";
+        instruction_pointer_ = cur_command.args[0].first;
+        return;
+      case 13:
+        //std::cout << "execute 13\n";
+        instruction_stack_.push(instruction_pointer_);
+        instruction_pointer_ = cur_command.args[0].first;
+        return;
+      case 14:
       {
+        //std::cout << "execute 14\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
 
-        instruction_pointer_ = commands.size() - 1;
+        if (arg_a == arg_b) {
+          instruction_pointer_ = cur_command.args[0].first;
+          return;
+        }
         break;
       }
+      case 15:
+      {
+        //std::cout << "execute 15\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
+
+        if (arg_a != arg_b) {
+          instruction_pointer_ = cur_command.args[0].first;
+        }
+        return;
+      }
+      case 16:
+      {
+        //std::cout << "execute 16\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
+
+        if (arg_a < arg_b) {
+          instruction_pointer_ = cur_command.args[0].first;
+        }
+        return;
+      }
+      case 17:
+      {
+        //std::cout << "execute 17\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
+
+        if (arg_a <= arg_b) {
+          instruction_pointer_ = cur_command.args[0].first;
+        }
+        return;
+      }
+      case 18:
+        //std::cout << "execute 18\n";
+        instruction_pointer_ = instruction_stack_.extract() + 1;
+        return;
+
       default:
         throw IncorrectArgumentException(std::string("unknown command code") +
                                            std::to_string(cur_command.cmd_id),
                                          __PRETTY_FUNCTION__);
     }
+    //stack_.printStack();
     ++instruction_pointer_;
   }
 
