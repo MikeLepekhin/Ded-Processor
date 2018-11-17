@@ -502,6 +502,13 @@ class Stack {
     return get(item_count_ - 1);
   }
 
+  T extract() {
+    T result = get(item_count_ - 1);
+
+    pop();
+    return result;
+  }
+
 #ifndef NDEBUG
   bool check() const {
     try {

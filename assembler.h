@@ -226,10 +226,13 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
       assemblyCommand(9, "in", 1, 6, asm_file, binary_file);
     } else if (cmd == "out") {
       assemblyCommand(10, "out", 1, 7, asm_file, binary_file);
+    } else if (cmd == "end") {
+      assemblyCommand(11, "end", 0, 0, asm_file, binary_file);
     } else {
       throw IncorrectArgumentException(std::string("incorrect command") + cmd);
     }
   }
+  assemblyCommand(11, "end", 0, 0, asm_file, binary_file);
 }
 
 #endif //DED_PROCESSOR_ASSEMBLER_H

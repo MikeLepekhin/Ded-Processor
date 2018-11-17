@@ -8,6 +8,9 @@
 #include <cstdio>
 #include <iostream>
 #include <array>
+#include <thread>
+#include <chrono>
+
 #include "exception.h"
 
 template<class T, size_t SIZE = 1000000>
@@ -21,6 +24,8 @@ class RAM {
     if (address > SIZE) {
       throw OutOfRangeException("incorrect memory address", __PRETTY_FUNCTION__);
     }
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     return memory_cells[address];
   }
 
@@ -28,6 +33,8 @@ class RAM {
     if (address > SIZE) {
       throw OutOfRangeException("incorrect memory address", __PRETTY_FUNCTION__);
     }
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     memory_cells[address] = value;
   }
 };

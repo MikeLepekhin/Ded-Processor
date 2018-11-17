@@ -2,6 +2,7 @@ in rax
 push rax
 in rbx
 push rbx
-add
-pop rcx
-out rcx
+div
+pop rdx
+out rdx
+end

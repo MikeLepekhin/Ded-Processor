@@ -116,14 +116,14 @@ class Processor {
 
     switch (cur_command.cmd_id) {
       case 1:
-        std::cout << "execute 11\n";
+        //std::cout << "execute 11\n";
         stack_.push(getArgumentValue(cur_command.args[0]));
         break;
       case 2:
       {
-        std::cout << "execute 2\n";
-        T value = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 2\n";
+        T value = stack_.extract();
+
         if (cur_command.args[0].second == 2) {
           registers_[getIntValue(cur_command.args[0])] = value;
         } else if (cur_command.args[0].second == 3) {
@@ -135,47 +135,39 @@ class Processor {
       }
       case 3:
       {
-        std::cout << "execute 3\n";
-        T arg_b = stack_.top();
-        stack_.pop();
-        T arg_a = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 3\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
 
         stack_.push(arg_a + arg_b);
         break;
       }
       case 4:
       {
-        std::cout << "execute 4\n";
-        T arg_b = stack_.top();
-        stack_.pop();
-        T arg_a = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 4\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
 
         stack_.push(arg_a - arg_b);
         break;
       }
       case 5:
       {
-        std::cout << "execute 5\n";
-        T arg_b = stack_.top();
-        stack_.pop();
-        T arg_a = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 5\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
 
         stack_.push(arg_a * arg_b);
         break;
       }
       case 6:
       {
-        std::cout << "execute 6\n";
-        T arg_b = stack_.top();
-        stack_.pop();
-        T arg_a = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 6\n";
+        T arg_b = stack_.extract();
+        T arg_a = stack_.extract();
 
         if (arg_b == 0.0) {
-          throw DivisionByZeroException("", __PRETTY_FUNCTION__);
+          throw DivisionByZeroException("division by zero", __PRETTY_FUNCTION__);
         }
 
         stack_.push(arg_a / arg_b);
@@ -183,16 +175,15 @@ class Processor {
       }
       case 7:
       {
-        std::cout << "execute 7\n";
-        T arg_top = stack_.top();
-        stack_.pop();
+        //std::cout << "execute 7\n";
+        T arg_top = stack_.extract();
 
         stack_.push(sqrt(arg_top));
         break;
       }
       case 8:
       {
-        std::cout << "execute 8\n";
+        //std::cout << "execute 8\n";
         T arg_top = stack_.top();
 
         stack_.push(arg_top);
@@ -200,7 +191,7 @@ class Processor {
       }
       case 9:
       {
-        std::cout << "execute 9\n";
+        //std::cout << "execute 9\n";
         if (cur_command.args[0].second == 2) {
           inCmd(registers_[getIntValue(cur_command.args[0])]);
         } else if (cur_command.args[0].second == 3) {
@@ -215,8 +206,14 @@ class Processor {
       }
       case 10:
       {
-        std::cout << "execute 10\n";
+        //std::cout << "execute 10\n";
         outCmd(getArgumentValue(cur_command.args[0]));
+        break;
+      }
+      case 11:
+      {
+
+        instruction_pointer_ = commands.size() - 1;
         break;
       }
       default:
@@ -235,6 +232,7 @@ class Processor {
     while (!isDone()) {
       executeCommand();
     }
+    std::cout << "# processor: execution is finished\n";
   }
 };
 
