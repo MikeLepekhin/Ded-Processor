@@ -216,43 +216,16 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
       continue;
     }
 
-    if (cmd == "push") {
-      assemblyCommand(1, "push", 1, 7, commands, label_request, asm_file);
-    } else if (cmd == "pop") {
-      assemblyCommand(2, "pop", 1, 6, commands, label_request, asm_file);
-    } else if (cmd == "add") {
-      assemblyCommand(3, "add", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "sub") {
-      assemblyCommand(4, "sub", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "mul") {
-      assemblyCommand(5, "mul", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "div") {
-      assemblyCommand(6, "div", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "sqrt") {
-      assemblyCommand(7, "sqrt", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "dup") {
-      assemblyCommand(8, "dup", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "in") {
-      assemblyCommand(9, "in", 1, 6, commands, label_request, asm_file);
-    } else if (cmd == "out") {
-      assemblyCommand(10, "out", 1, 7, commands, label_request, asm_file);
-    } else if (cmd == "end") {
-      assemblyCommand(11, "end", 0, 0, commands, label_request, asm_file);
-    } else if (cmd == "jmp") {
-      assemblyCommand(12, "jmp", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "call") {
-      assemblyCommand(13, "call", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "je") {
-      assemblyCommand(14, "je", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "jne") {
-      assemblyCommand(15, "jne", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "jl") {
-      assemblyCommand(16, "jl", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "jle") {
-      assemblyCommand(17, "jle", 1, 1, commands, label_request, asm_file);
-    } else if (cmd == "ret") {
-      assemblyCommand(18, "ret", 0, 0, commands, label_request, asm_file);
-    } else {
+    if (false) {
+
+    }
+#define COMMAND(cmd_id, name, arg_cnt, arg_mask) \
+    else if (cmd == name) {\
+      assemblyCommand(cmd_id, name, arg_cnt, arg_mask, commands, label_request, asm_file);\
+    }
+#include "commands.h"
+#undef COMMAND
+    else {
       throw IncorrectArgumentException(std::string("incorrect command ") + cmd);
     }
   }

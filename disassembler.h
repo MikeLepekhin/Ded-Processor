@@ -119,46 +119,20 @@ void disassembly(FILE* binary_file = stdin, FILE* decode_file = stdout) {
   std::vector<Command<double>> commands;
 
   while (!fbuffer.done()) {
-    size_t cmd_id = fbuffer.readFromBuffer<size_t>();
+    size_t cur_cmd_id = fbuffer.readFromBuffer<size_t>();
 
-    if (cmd_id == 1) {
-      disassemblyCommand(cmd_id, "push", 1, 7, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 2) {
-      disassemblyCommand(cmd_id, "pop", 1, 6, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 3) {
-      disassemblyCommand(3, "add", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 4) {
-      disassemblyCommand(4, "sub", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 5) {
-      disassemblyCommand(5, "mul", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 6) {
-      disassemblyCommand(6, "div", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 7) {
-      disassemblyCommand(7, "sqrt", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 8) {
-      disassemblyCommand(8, "dup", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 9) {
-      disassemblyCommand(9, "in", 1, 6, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 10) {
-      disassemblyCommand(10, "out", 1, 7, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 11) {
-      disassemblyCommand(11, "end", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 12) {
-      disassemblyCommand(12, "jmp", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 13) {
-      disassemblyCommand(13, "call", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 14) {
-      disassemblyCommand(14, "je", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 15) {
-      disassemblyCommand(15, "jne", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 16) {
-      disassemblyCommand(16, "jl", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 17) {
-      disassemblyCommand(17, "jle", 1, 1, fbuffer, commands, jumps_to, decode_file);
-    } else if (cmd_id == 18) {
-      disassemblyCommand(18, "ret", 0, 0, fbuffer, commands, jumps_to, decode_file);
-    } else {
-      throw IncorrectArgumentException(std::string("incorrect command id ") + std::to_string(cmd_id));
+    switch (cur_cmd_id) {
+#define COMMAND(cmd_id, name, arg_cnt, arg_mask) \
+    case cmd_id :\
+      disassemblyCommand(cmd_id, name, arg_cnt, arg_mask, fbuffer, commands, jumps_to, decode_file);\
+      break;
+
+#include "commands.h"
+#undef COMMAND
+
+      default: {
+        throw IncorrectArgumentException(std::string("incorrect command id ") + std::to_string(cur_cmd_id));
+      }
     }
   }
 

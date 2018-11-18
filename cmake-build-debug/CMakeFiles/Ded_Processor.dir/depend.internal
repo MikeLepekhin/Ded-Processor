@@ -3,6 +3,7 @@
 
 CMakeFiles/Ded_Processor.dir/main.cpp.o
  /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/assembler.h
+ /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/commands.h
  /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/common_classes.h
  /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/disassembler.h
  /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/exception.h
