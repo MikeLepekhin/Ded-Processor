@@ -1,9 +1,0 @@
-in rax
-out rax
-in rbx
-out rbx
-push rax
-push rbx
-add
-pop rcx
-out rcx
