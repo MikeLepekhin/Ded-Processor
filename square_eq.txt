@@ -1,8 +1,0 @@
-in rax
-in rbx
-in rcx
-
-
-
-
-:finish
