@@ -16,7 +16,6 @@
 
 #include "common_classes.h"
 #include "exception.h"
-#include "executor.h"
 
 const size_t ARG_SIZE = 30;
 
@@ -110,11 +109,6 @@ std::pair<int, int> objectRAM(char arg[ARG_SIZE]) {
   }
 }
 
-bool isJump(const std::string& cmd_name) {
-  return cmd_name == "jmp" || cmd_name == "call" || cmd_name == "je" || cmd_name == "jne" ||
-         cmd_name == "jl" || cmd_name == "jle";
-}
-
 void parseCommand(size_t cmd_id, const std::string& cmd, size_t arg_cnt, size_t support_mask,
                   std::vector<std::pair<double, int>>& arg_values, std::vector<std::string>& label_request,
                   FILE* asm_file) {
@@ -124,9 +118,6 @@ void parseCommand(size_t cmd_id, const std::string& cmd, size_t arg_cnt, size_t 
   if (isJump(cmd)) {
     fscanf(asm_file, "%s", arg);
     label_request.push_back(std::string(arg));
-
-    //std::cout << "!!! JUMP\n";
-    //std::cout << arg << '\n';
     return;
   }
 

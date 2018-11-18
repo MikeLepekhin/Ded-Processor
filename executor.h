@@ -13,8 +13,8 @@
 
 #include "stack.h"
 #include "ram.h"
-//#include "disassembler.h"
 #include "file_buffer.h"
+#include "common_classes.h"
 
 const size_t REGISTER_COUNT = 16;
 const size_t COMMAND_COUNT = 30;

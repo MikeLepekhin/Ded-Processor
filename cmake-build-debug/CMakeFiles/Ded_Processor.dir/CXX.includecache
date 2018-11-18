@@ -27,8 +27,6 @@ common_classes.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/common_classes.h
 exception.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/exception.h
-executor.h
-/home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/executor.h
 
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/common_classes.h
 iostream
@@ -59,6 +57,8 @@ file_buffer.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/file_buffer.h
 exception.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/exception.h
+common_classes.h
+/home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/common_classes.h
 
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/exception.h
 iostream
@@ -81,6 +81,8 @@ ram.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/ram.h
 file_buffer.h
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/file_buffer.h
+common_classes.h
+/home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/common_classes.h
 
 /home/mike/Документы/MIPT_sem5/ded_course/Ded-Processor/file_buffer.h
 
