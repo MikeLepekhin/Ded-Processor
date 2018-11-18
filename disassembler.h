@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <set>
+#include <algorithm>
 #include <unordered_map>
 
 #include "file_buffer.h"
@@ -92,13 +94,15 @@ void disassemblyCommand(size_t cmd_id, const char* cmd, size_t arg_cnt, size_t s
   std::vector<std::pair<double, int>> arg_values;
 
   readCommand(cmd_id, cmd, arg_cnt, support_mask, arg_values, fbuffer);
-  decodeCommand(cmd, arg_cnt, arg_values, decode_file);
+  //decodeCommand(cmd, arg_cnt, arg_values, decode_file);
 }
 
 void disassembly(FILE* binary_file = stdin, FILE* decode_file = stdout) {
   FileBuffer fbuffer(binary_file);
 
-  std::unordered_map<std::string, size_t> labels;
+  std::set<size_t> used_labels;
+  Command<double> kkk;
+  //std::vector<Command<double>> commands;
 
   while (true) {
     size_t cmd_id;

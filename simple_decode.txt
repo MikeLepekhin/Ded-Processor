@@ -1,0 +1,7 @@
+push 1.000000
+push 2.000000
+add
+pop r13
+pop [rax+5]
+push 1.600000
+pop rbx

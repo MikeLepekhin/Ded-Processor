@@ -1,0 +1,1 @@
+/usr/bin/clang++-5.0  -g   CMakeFiles/Ded_Processor.dir/main.cpp.o  -o Ded_Processor 

@@ -13,20 +13,12 @@
 
 #include "stack.h"
 #include "ram.h"
-#include "disassembler.h"
+//#include "disassembler.h"
 #include "file_buffer.h"
 
 const size_t REGISTER_COUNT = 16;
 const size_t COMMAND_COUNT = 30;
 const size_t MAX_ARG_COUNT = 2;
-
-template<class T>
-struct Command {
-  size_t cmd_id;
-  std::string cmd_name;
-  size_t arg_cnt;
-  std::vector<std::pair<T, int>> args;
-};
 
 template<class T = double>
 class Processor {
@@ -242,8 +234,9 @@ class Processor {
 
         if (arg_a != arg_b) {
           instruction_pointer_ = cur_command.args[0].first;
+          return;
         }
-        return;
+        break;
       }
       case 16:
       {
@@ -253,8 +246,9 @@ class Processor {
 
         if (arg_a < arg_b) {
           instruction_pointer_ = cur_command.args[0].first;
+          return;
         }
-        return;
+        break;
       }
       case 17:
       {
@@ -264,8 +258,9 @@ class Processor {
 
         if (arg_a <= arg_b) {
           instruction_pointer_ = cur_command.args[0].first;
+          return;
         }
-        return;
+        break;
       }
       case 18:
         //std::cout << "execute 18\n";

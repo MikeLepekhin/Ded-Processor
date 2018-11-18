@@ -1,0 +1,36 @@
+in rbx
+in rcx
+
+push rbx
+push 0
+je b_equals_0
+push 0
+push rcx
+sub
+push rbx
+div
+jmp print_one_linear_root
+
+:b_equals_0
+    push rcx
+    push 0
+    jne print_no_roots
+    jmp print_inf_roots
+
+
+:print_inf_roots
+    move 100500 rax
+    out rax
+    end
+
+:print_no_roots
+    move 0 rax
+    out rax
+    end
+
+:print_one_linear_root
+    move 1 rax
+    out rax
+    pop r11
+    out r11
+    end

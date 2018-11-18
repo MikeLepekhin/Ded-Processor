@@ -1,0 +1,36 @@
+in rax
+push rax
+push rax
+push 1
+jle n_leq_1
+
+push 1
+push 1
+
+:calc_fibonacci
+    push rax
+    push 1
+    jle print_answer
+    
+    pop rdx
+    pop rcx
+    push rdx 
+    push rcx
+    push rdx
+    add
+
+    push rax 
+    push 1
+    sub
+    pop rax
+    call calc_fibonacci
+    
+
+:print_answer
+    pop r15
+    out r15
+    end
+
+:n_leq_1
+    push 1
+    jmp print_answer

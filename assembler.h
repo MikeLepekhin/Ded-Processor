@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <ctype.h>
 
+#include "common_classes.h"
 #include "exception.h"
 #include "executor.h"
 
@@ -267,13 +268,15 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
   assemblyCommand(11, "end", 0, 0, commands, label_request, asm_file);
 
 
+  for (const std::string& label: label_request) {
+    if (jump_to.find(label) == jump_to.end()) {
+      throw IncorrectArgumentException("incorrect label value" + label, __PRETTY_FUNCTION__);
+    }
+  }
+
   for (Command<double>& command: commands) {
     if (isJump(command.cmd_name)) {
       std::string cur_label = label_request[cur_label_request++];
-
-      if (jump_to.find(cur_label) == jump_to.end()) {
-        throw IncorrectArgumentException("incorrect label value", __PRETTY_FUNCTION__);
-      }
       command.args.push_back({jump_to[cur_label], 1});
     }
     encodeCommand(command, binary_file);
