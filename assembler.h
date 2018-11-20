@@ -196,6 +196,7 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
     }
 
     std::string cmd = cmd_buf;
+    std::cout << cmd << '\n';
 
     removeSpaceChars(cmd);
     if (cmd == "") {
@@ -219,7 +220,7 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
     if (false) {
 
     }
-#define COMMAND(cmd_id, name, arg_cnt, arg_mask) \
+#define COMMAND(cmd_id, name, arg_cnt, arg_mask, cmd_source) \
     else if (cmd == name) {\
       assemblyCommand(cmd_id, name, arg_cnt, arg_mask, commands, label_request, asm_file);\
     }

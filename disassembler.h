@@ -122,7 +122,7 @@ void disassembly(FILE* binary_file = stdin, FILE* decode_file = stdout) {
     size_t cur_cmd_id = fbuffer.readFromBuffer<size_t>();
 
     switch (cur_cmd_id) {
-#define COMMAND(cmd_id, name, arg_cnt, arg_mask) \
+#define COMMAND(cmd_id, name, arg_cnt, arg_mask, source) \
     case cmd_id :\
       disassemblyCommand(cmd_id, name, arg_cnt, arg_mask, fbuffer, commands, jumps_to, decode_file);\
       break;
