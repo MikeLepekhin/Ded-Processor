@@ -213,7 +213,7 @@ void assembly(FILE* asm_file = stdin, FILE* binary_file = stdout) {
 
     if (cmd == "move") {
       assemblyCommand(1, "push", 1, 7, commands, label_request, asm_file);
-      assemblyCommand(2, "pop", 1, 6, commands, label_request, asm_file);
+      assemblyCommand(2, "pop",  1, 6, commands, label_request, asm_file);
       continue;
     }
 

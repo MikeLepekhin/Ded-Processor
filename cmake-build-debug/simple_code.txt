@@ -1,6 +1,118 @@
-add
-push 1
-push 2
-add
-push 3
-mul
+in rax
+in rbx
+in rcx
+
+push rax
+push 0
+je linear_equation
+jmp square_equation
+
+:square_equation
+    push rbx
+    push rbx
+    mul
+    pop r5
+
+    push rax
+    push rcx
+    mul
+    pop r6
+
+    push 4.0
+    push r6
+    mul
+    pop r7
+
+    push r5
+    push r7
+    sub
+    pop rdx
+
+
+    call calc_square_roots
+
+    push rdx
+    push 0
+    jl print_no_roots
+
+    out rdx
+    push rdx
+
+    push 0
+    je print_one_root
+    jmp print_two_roots
+
+
+:calc_square_roots
+    push 0
+    push rbx
+    sub
+    pop r8
+
+    push 2.0
+    push rax
+    mul
+    pop r9
+
+    push rdx
+    sqrt
+    pop r10
+
+    push r8
+    push r10
+    add
+    push r9
+    div
+
+    push r8
+    push r10
+    sub
+    push r9
+    div
+
+    ret
+
+:linear_equation
+    push rbx
+    push 0
+    je b_equals_0
+    push 0
+    push rcx
+    sub
+    push rbx
+    div
+    jmp print_one_root
+
+:b_equals_0
+    push rcx
+    push 0
+    jne print_no_roots
+    jmp print_inf_roots
+
+
+:print_inf_roots
+    move 100500 r14
+    out r14
+    end
+
+:print_no_roots
+    move 0 r14
+    out r14
+    end
+
+:print_one_root
+    move 1 r14
+    out r14
+    pop r11
+    out r11
+    end
+
+:print_two_roots
+    move 2 r14
+    out r14
+
+    pop r11
+    pop r12
+    out r11
+    out r12
+    end
